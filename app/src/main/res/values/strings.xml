@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Weather App</string>
+    <string name="refresh">Refresh</string>
+    <string name="metric">Metric</string>
+    <string name="monday_novermber_28_2022">Monday, Novermber 28, 2022</string>
+    <string name="clear">Clear</string>
+    <string name="_34">34</string>
+</resources>
