@@ -102,7 +102,7 @@
                 android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/adamina"
-                android:text="Tues\n32°"
+                android:text="Tue\n32°"
                 android:textAlignment="center" />
 
             <TextView
@@ -122,7 +122,7 @@
                 android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/adamina"
-                android:text="Thur\n32°"
+                android:text="Thu\n32°"
                 android:textAlignment="center" />
 
             <TextView
@@ -155,15 +155,6 @@
                 android:text="Sun\n32°"
                 android:textAlignment="center" />
 
-            <TextView
-                android:id="@+id/day7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/adamina"
-                android:text="Mon\n32°"
-                android:textAlignment="center" />
         </LinearLayout>
     </HorizontalScrollView>
 
