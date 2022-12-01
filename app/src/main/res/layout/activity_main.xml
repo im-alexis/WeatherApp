@@ -10,18 +10,18 @@
 
     <TextView
         android:id="@+id/weatherWord"
-        android:layout_width="175dp"
-        android:layout_height="23dp"
+        android:layout_width="171dp"
+        android:layout_height="46dp"
         android:fontFamily="@font/adamina"
+        android:text="Thunderstornm w/ Heavy Hail"
         android:textColor="@color/white"
-        android:text="@string/clear"
-        android:textSize="20sp"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.067"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.384" />
+        app:layout_constraintVertical_bias="0.408" />
 
     <Switch
         android:id="@+id/unitsForTemp"
@@ -57,35 +57,35 @@
         android:layout_width="340dp"
         android:layout_height="40dp"
         android:fontFamily="@font/adamina"
-        android:textColor="@color/white"
         android:text="@string/monday_novermber_28_2022"
         android:textAlignment="textStart"
+        android:textColor="@color/white"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.153"
+        app:layout_constraintHorizontal_bias="0.338"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.085" />
+        app:layout_constraintVertical_bias="0.081" />
 
     <TextView
         android:id="@+id/temperature"
         android:layout_width="153dp"
         android:layout_height="128dp"
-        android:textColor="@color/white"
         android:text="34°"
         android:textAlignment="center"
+        android:textColor="@color/white"
         android:textSize="96sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.222" />
+        app:layout_constraintVertical_bias="0.194" />
 
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
-        android:layout_width="411dp"
-        android:layout_height="66dp"
+        android:layout_width="406dp"
+        android:layout_height="94dp"
         android:background="@drawable/background2"
         android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -93,7 +93,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.499">
+        app:layout_constraintVertical_bias="0.532">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -104,67 +104,67 @@
                 android:id="@+id/day1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:layout_margin="5dp"
+                android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/adamina"
                 android:text="Tue\n32°\nHumidity: 88%"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/day2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:layout_margin="5dp"
+                android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/adamina"
                 android:text="Wed\n31°\nHumidity: 88%"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/day3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:layout_margin="5dp"
+                android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/adamina"
                 android:text="Thu\n32°\nHumidity: 88%"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/day4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:layout_margin="5dp"
+                android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/adamina"
                 android:text="Fri\n32°\nHumidity: 88%"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/day5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:layout_margin="5dp"
+                android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/adamina"
                 android:text="Sat\n32°\nHumidity: 88%"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/day6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:layout_margin="5dp"
+                android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/adamina"
                 android:text="Sun\n32°\nHumidity: 88%"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/white" />
 
         </LinearLayout>
     </HorizontalScrollView>
@@ -173,11 +173,11 @@
         android:id="@+id/lonView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
         android:text="@string/longitude_95_32"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.903"
+        app:layout_constraintHorizontal_bias="0.844"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.022" />
@@ -186,12 +186,12 @@
         android:id="@+id/latView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
         android:layout_marginStart="24dp"
         android:text="Latitude: 95.53"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/lonView"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.116"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.022" />
@@ -203,7 +203,7 @@
         android:textColor="@color/white"
         android:ems="10"
         android:hint="Latitude (##.##)"
-        android:inputType="textPersonName"
+        android:inputType="numberDecimal|numberSigned"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -219,7 +219,7 @@
         android:textColor="@color/white"
         android:ems="10"
         android:hint="Longitude (##.##)"
-        android:inputType="textPersonName"
+        android:inputType="numberDecimal|numberSigned"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -240,5 +240,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.674" />
+
+    <TextView
+        android:id="@+id/humidityText"
+        android:layout_width="160dp"
+        android:layout_height="48dp"
+        android:fontFamily="@font/adamina"
+        android:text="Humidity: 88%"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.884"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.409" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,6 +13,7 @@ import android.icu.util.TimeZone;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -36,12 +37,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private String tempUnits = "fahrenheit";
-    private TimeZone tz;
     private double lastLongitude = -95.36; // default coordinates is Houston
     private double lastLatitude = 29.76;
     private double defaultLongitude = -95.36;
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private DecimalFormat dr = new DecimalFormat ("#.##");
     private DecimalFormat tdr = new DecimalFormat ("#.#");
+    private String deviceTimeZone;
 
 
 
@@ -76,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
         Switch autoSwitch = findViewById(R.id.autoLocation);
         Switch unitSwitch = findViewById(R.id.unitsForTemp);
         Button refreshButton = findViewById(R.id.refreshButton);
+        TimeZone tz = TimeZone.getDefault();
+         deviceTimeZone = tz.getDisplayName(false,TimeZone.SHORT_COMMONLY_USED).trim();
+        Log.d("Test", deviceTimeZone);
         workWithJson ();
 
 
@@ -112,13 +118,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE}, PackageManager.PERMISSION_GRANTED);
             return;
         }
@@ -126,12 +125,10 @@ public class MainActivity extends AppCompatActivity {
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                            autoLatitude = location.getLongitude();
                            autoLatitude = location.getLatitude();
                         }
-                        Log.d("Response", "No Location there");
                     }
                 });
         autoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -166,9 +163,6 @@ public class MainActivity extends AppCompatActivity {
         unitSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // on below line we are checking
-                // if switch is checked or not.
-
                 if (isChecked) {
                     tempUnits = "celsius";
                     Log.d("Switch", "Units now in Celsius");
@@ -219,8 +213,8 @@ public class MainActivity extends AppCompatActivity {
             i = 0;
             tempDay.setText(week.get(i) + holdData);
         }
-       tempDay = findViewById(R.id.day2);
-         holdData = tempDay.getText().toString().substring(3);
+        tempDay = findViewById(R.id.day2);
+        holdData = tempDay.getText().toString().substring(3);
 
         if(i !=  week.size() - 1){
             tempDay.setText(week.get(i+1) + holdData);
@@ -279,19 +273,21 @@ public class MainActivity extends AppCompatActivity {
     //https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m,relativehumidity_2m,weathercode,visibility&temperature_unit=fahrenheit&timezone=America%2FChicago
     private void workWithJson (){
         Log.d("App", "Calling API");
-        String url = "https://api.open-meteo.com/v1/forecast?latitude="+String.valueOf(lastLatitude)+"&longitude="+String.valueOf(lastLongitude)+"&hourly=temperature_2m,relativehumidity_2m,weathercode,visibility&temperature_unit="+tempUnits   +"&timezone=America%2FChicago";
+        String url = "https://api.open-meteo.com/v1/forecast?latitude="+lastLatitude+"&longitude="+ lastLongitude +"&hourly=temperature_2m,relativehumidity_2m,weathercode,visibility&temperature_unit="+tempUnits   +"&timezone="+deviceTimeZone;
         StringRequest apiCall = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                //Log.d("test",response);
+
                 String output = "";
                 try {
                     JSONObject jsonResponse = new JSONObject(response);
                     JSONObject elementsJSONArray = jsonResponse.getJSONObject("hourly");
                     JSONArray weatherArray = elementsJSONArray.getJSONArray("temperature_2m");
                     JSONArray humidityArray = elementsJSONArray.getJSONArray("relativehumidity_2m");
-
+                    JSONArray weatherCodeArray = elementsJSONArray.getJSONArray("weathercode");
                     setTemp(weatherArray, humidityArray);
+                    currentConditions(weatherCodeArray, weatherArray,humidityArray);
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -308,89 +304,166 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setTemp (JSONArray weather, JSONArray humidity) throws JSONException {
-        Log.d("APP", "Setting forecast values");
+        Log.d("App", "Setting forecast values");
 
         TextView tempDay = findViewById(R.id.day1);
         String holdData = tempDay.getText().toString().substring(0,4);
         double tempValue = 0;
         int hummy = 0;
         for (int i = 24; i < 48; i++){
-           double measure = weather.getDouble(i);
-           tempValue = tempValue + measure;
-           int measure2 = humidity.getInt(i);
-            hummy = hummy + measure2;
+            tempValue = tempValue + weather.getDouble(i);;
+            hummy = hummy + humidity.getInt(i);
         }
         hummy = hummy/24;
         tempValue = Double.parseDouble(tdr.format(tempValue/24));
-        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
+        tempDay.setText(holdData + (int)tempValue+ "°"+"\nHumidity: " + hummy +"%");
 
         tempDay = findViewById(R.id.day2);
         holdData = tempDay.getText().toString().substring(0,4);
         tempValue = 0;
         for (int i = 48; i < 72; i++){
-            double measure = weather.getDouble(i);
-            tempValue = tempValue + measure;
-            int measure2 = humidity.getInt(i);
-            hummy = hummy + measure2;
+            tempValue = tempValue + weather.getDouble(i);
+            hummy = hummy + humidity.getInt(i);
         }
         hummy = hummy/24;
         tempValue = Double.parseDouble(tdr.format(tempValue/24));
-        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
+        tempDay.setText(holdData + (int)tempValue+ "°"+"\nHumidity: " + hummy +"%");
 
         tempDay = findViewById(R.id.day3);
         holdData = tempDay.getText().toString().substring(0,4);
         tempValue = 0;
         for (int i = 72; i < 96; i++){
-            double measure = weather.getDouble(i);
-            tempValue = tempValue + measure;
-            int measure2 = humidity.getInt(i);
-            hummy = hummy + measure2;
+            tempValue = tempValue + weather.getDouble(i);
+            hummy = hummy + humidity.getInt(i);
         }
         hummy = hummy/24;
         tempValue = Double.parseDouble(tdr.format(tempValue/24));
-        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
+        tempDay.setText(holdData + (int)tempValue+ "°"+"\nHumidity: " + hummy +"%");
 
         tempDay = findViewById(R.id.day4);
         holdData = tempDay.getText().toString().substring(0,4);
         tempValue = 0;
         for (int i = 96; i < 120; i++){
-            double measure = weather.getDouble(i);
-            tempValue = tempValue + measure;
-            int measure2 = humidity.getInt(i);
-            hummy = hummy + measure2;
+            tempValue = tempValue + weather.getDouble(i);
+            hummy = hummy + humidity.getInt(i);
         }
         hummy = hummy/24;
         tempValue = Double.parseDouble(tdr.format(tempValue/24));
-        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
+        tempDay.setText(holdData + (int)tempValue+ "°"+"\nHumidity: " + hummy +"%");
 
         tempDay = findViewById(R.id.day5);
         holdData = tempDay.getText().toString().substring(0,4);
         tempValue = 0;
         for (int i = 120; i < 144; i++){
-            double measure = weather.getDouble(i);
-            tempValue = tempValue + measure;
-            int measure2 = humidity.getInt(i);
-            hummy = hummy + measure2;
+            tempValue = tempValue + weather.getDouble(i);
+            hummy = hummy + humidity.getInt(i);
         }
         hummy = hummy/24;
         tempValue = Double.parseDouble(tdr.format(tempValue/24));
-        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
+        tempDay.setText(holdData +(int)tempValue+ "°"+"\nHumidity: " + hummy +"%");
 
         tempDay = findViewById(R.id.day6);
         holdData = tempDay.getText().toString().substring(0,4);
         tempValue = 0;
         for (int i = 144; i < 168; i++){
-            double measure = weather.getDouble(i);
-            tempValue = tempValue + measure;
-            int measure2 = humidity.getInt(i);
-            hummy = hummy + measure2;
+            tempValue = tempValue + weather.getDouble(i);
+            hummy = hummy + humidity.getInt(i);
         }
         hummy = hummy/24;
         tempValue = Double.parseDouble(tdr.format(tempValue/24));
-        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
+        tempDay.setText(holdData + (int)tempValue+ "°"+"\nHumidity: " + hummy +"%");
     }
-    private void currentConditions (){
+    private void currentConditions (JSONArray weatherCode, JSONArray temo, JSONArray humidity) throws JSONException {
+        Log.d("App", "Setting the current weather");
+        String currentTime = new SimpleDateFormat("HH", Locale.getDefault()).format(new Date());
+        Integer index = Integer.parseInt(currentTime);
+        Log.d("Test", currentTime);
+        TextView bigWeather = findViewById(R.id.temperature);
+        double measure = temo.getDouble(index);
+        Log.d("test", String.valueOf(measure));
+        bigWeather.setText((int) measure +"°");
+        TextView humidityText = findViewById(R.id.humidityText);
+        int hum = humidity.getInt(index);
+        humidityText.setText("Humidity: " + hum + "%");
+        TextView codeText = findViewById(R.id.weatherWord);
+        codeText.setText(weatherCodeWord(weatherCode.getInt(index), codeText));
+    }
+    private String weatherCodeWord (int code , TextView codeText){
 
+        codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f);
+        String word = "";
+        if(code == 0){
+            word = "Clear sky";
+        } else if(code == 1){
+            word = "Mainly Clear";
+        } else if(code == 2){
+            word = "Partly Cloudy";
+        }else if(code == 3){
+            word = "Overcast";
+        }else if(code == 45){
+            word = "Fog";
+        }else if(code == 48){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Depositing Rime Fog";
+        }else if(code == 51){
+            word = "Light Drizzle";
+        }else if(code == 53){
+            word = "Moderate Drizzle";
+        }else if(code == 55){
+            word = "Dense Drizzle";
+        }else if(code == 56){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Freezing Light Drizzle";
+        }else if(code == 57){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Freezing Dense Drizzle";
+        }else if(code == 61){
+            word = "light Rain";
+        }else if(code == 63){
+            word = "Moderate Rain";
+        }else if(code == 65){
+            word = "Heavy Rain";
+        }else if(code == 66){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Freezing Light Rain";
+        }else if(code == 67){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Freezing Heavy Rain";
+        }else if(code == 71){
+            word = "Light Snow";
+        }else if(code == 73){
+            word = "Moderate Rain";
+        }else if(code == 75){
+            word = "Heavy Snow";
+        }else if(code == 77){
+            word = "Snow Grains";
+        }else if(code == 80){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Light Rain Shower";
+        }else if(code == 81){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Moderate Rain Shower";
+        }else if(code == 82){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Violent Rain Shower";
+        }else if(code == 85){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Light Snow Shower";
+        }else if(code == 86){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Heavy Snow Shower";
+        }else if(code == 95){
+
+            word = "Thunderstorm";
+        }else if(code == 96){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Thunderstorm w/ Light Hail";
+        }else if(code == 99){
+            codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            word = "Thunderstorm w/ Heavy Hail";
+        }
+
+        return word;
     }
 
 }
