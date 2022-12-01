@@ -31,6 +31,10 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 
@@ -57,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     };
     private FusedLocationProviderClient fusedLocationClient;
     private DecimalFormat dr = new DecimalFormat ("#.##");
+    private DecimalFormat tdr = new DecimalFormat ("#.#");
 
 
 
@@ -91,8 +96,11 @@ public class MainActivity extends AppCompatActivity {
                     latText.setText("Longitude cannot be empty");
                 }
                 else if(!lon.equals("") && !lat.equals("")){
+
                     lastLatitude = defaultLatitude = Double.valueOf(lat);
                     lastLongitude = defaultLongitude = Double.valueOf(lon);
+                    Log.d ("TEST", String.valueOf(lastLatitude));
+                    Log.d ("TEST", String.valueOf(lastLongitude));
                     setCords(lastLongitude,lastLatitude);
                     workWithJson ();
                 }
@@ -111,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, PackageManager.PERMISSION_GRANTED);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE}, PackageManager.PERMISSION_GRANTED);
             return;
         }
         fusedLocationClient.getLastLocation()
@@ -184,7 +192,6 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat temp = new SimpleDateFormat("EEE");
         String date = dateFormat.format(calendar.getTime());
         String dayTemp = temp.format(calendar.getTime());
-        Log.d("Test", dayTemp);
         dateTimeDisplay.setText(date);
         setWeek(dayTemp);
     }
@@ -272,12 +279,23 @@ public class MainActivity extends AppCompatActivity {
     //https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m,relativehumidity_2m,weathercode,visibility&temperature_unit=fahrenheit&timezone=America%2FChicago
     private void workWithJson (){
         Log.d("App", "Calling API");
-        String url = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m,relativehumidity_2m,weathercode,visibility&temperature_unit=fahrenheit&timezone=America%2FChicago";
-        StringRequest apiCall = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        String url = "https://api.open-meteo.com/v1/forecast?latitude="+String.valueOf(lastLatitude)+"&longitude="+String.valueOf(lastLongitude)+"&hourly=temperature_2m,relativehumidity_2m,weathercode,visibility&temperature_unit="+tempUnits   +"&timezone=America%2FChicago";
+        StringRequest apiCall = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d("test",response);
+                //Log.d("test",response);
+                String output = "";
+                try {
+                    JSONObject jsonResponse = new JSONObject(response);
+                    JSONObject elementsJSONArray = jsonResponse.getJSONObject("hourly");
+                    JSONArray weatherArray = elementsJSONArray.getJSONArray("temperature_2m");
+                    JSONArray humidityArray = elementsJSONArray.getJSONArray("relativehumidity_2m");
 
+                    setTemp(weatherArray, humidityArray);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -286,13 +304,90 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        requestQueue.add(apiCall);
     }
 
-    private void setTemp (){
+    private void setTemp (JSONArray weather, JSONArray humidity) throws JSONException {
+        Log.d("APP", "Setting forecast values");
 
-    }
-    private void setWeatherCode (){
+        TextView tempDay = findViewById(R.id.day1);
+        String holdData = tempDay.getText().toString().substring(0,4);
+        double tempValue = 0;
+        int hummy = 0;
+        for (int i = 24; i < 48; i++){
+           double measure = weather.getDouble(i);
+           tempValue = tempValue + measure;
+           int measure2 = humidity.getInt(i);
+            hummy = hummy + measure2;
+        }
+        hummy = hummy/24;
+        tempValue = Double.parseDouble(tdr.format(tempValue/24));
+        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
 
+        tempDay = findViewById(R.id.day2);
+        holdData = tempDay.getText().toString().substring(0,4);
+        tempValue = 0;
+        for (int i = 48; i < 72; i++){
+            double measure = weather.getDouble(i);
+            tempValue = tempValue + measure;
+            int measure2 = humidity.getInt(i);
+            hummy = hummy + measure2;
+        }
+        hummy = hummy/24;
+        tempValue = Double.parseDouble(tdr.format(tempValue/24));
+        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
+
+        tempDay = findViewById(R.id.day3);
+        holdData = tempDay.getText().toString().substring(0,4);
+        tempValue = 0;
+        for (int i = 72; i < 96; i++){
+            double measure = weather.getDouble(i);
+            tempValue = tempValue + measure;
+            int measure2 = humidity.getInt(i);
+            hummy = hummy + measure2;
+        }
+        hummy = hummy/24;
+        tempValue = Double.parseDouble(tdr.format(tempValue/24));
+        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
+
+        tempDay = findViewById(R.id.day4);
+        holdData = tempDay.getText().toString().substring(0,4);
+        tempValue = 0;
+        for (int i = 96; i < 120; i++){
+            double measure = weather.getDouble(i);
+            tempValue = tempValue + measure;
+            int measure2 = humidity.getInt(i);
+            hummy = hummy + measure2;
+        }
+        hummy = hummy/24;
+        tempValue = Double.parseDouble(tdr.format(tempValue/24));
+        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
+
+        tempDay = findViewById(R.id.day5);
+        holdData = tempDay.getText().toString().substring(0,4);
+        tempValue = 0;
+        for (int i = 120; i < 144; i++){
+            double measure = weather.getDouble(i);
+            tempValue = tempValue + measure;
+            int measure2 = humidity.getInt(i);
+            hummy = hummy + measure2;
+        }
+        hummy = hummy/24;
+        tempValue = Double.parseDouble(tdr.format(tempValue/24));
+        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
+
+        tempDay = findViewById(R.id.day6);
+        holdData = tempDay.getText().toString().substring(0,4);
+        tempValue = 0;
+        for (int i = 144; i < 168; i++){
+            double measure = weather.getDouble(i);
+            tempValue = tempValue + measure;
+            int measure2 = humidity.getInt(i);
+            hummy = hummy + measure2;
+        }
+        hummy = hummy/24;
+        tempValue = Double.parseDouble(tdr.format(tempValue/24));
+        tempDay.setText(holdData + tempValue+ "°"+"\nHumidity: " + hummy +"%");
     }
     private void currentConditions (){
 
