@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         Switch unitSwitch = findViewById(R.id.unitsForTemp);
         Button refreshButton = findViewById(R.id.refreshButton);
         TimeZone tz = TimeZone.getDefault();
-         deviceTimeZone = tz.getDisplayName(false,TimeZone.SHORT_COMMONLY_USED).trim();
+        deviceTimeZone = tz.getDisplayName(false,TimeZone.SHORT_COMMONLY_USED).trim();
         Log.d("Test", deviceTimeZone);
         workWithJson ();
 
@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
     private void setDates (){
         Log.d("App", "Setting the Date");
         TextView dateTimeDisplay = (TextView) findViewById(R.id.Date);
@@ -270,6 +271,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
     //https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m,relativehumidity_2m,weathercode,visibility&temperature_unit=fahrenheit&timezone=America%2FChicago
     private void workWithJson (){
         Log.d("App", "Calling API");
@@ -373,6 +375,7 @@ public class MainActivity extends AppCompatActivity {
         tempValue = Double.parseDouble(tdr.format(tempValue/24));
         tempDay.setText(holdData + (int)tempValue+ "°"+"\nHumidity: " + hummy +"%");
     }
+
     private void currentConditions (JSONArray weatherCode, JSONArray temo, JSONArray humidity) throws JSONException {
         Log.d("App", "Setting the current weather");
         String currentTime = new SimpleDateFormat("HH", Locale.getDefault()).format(new Date());
@@ -388,6 +391,7 @@ public class MainActivity extends AppCompatActivity {
         TextView codeText = findViewById(R.id.weatherWord);
         codeText.setText(weatherCodeWord(weatherCode.getInt(index), codeText));
     }
+
     private String weatherCodeWord (int code , TextView codeText){
 
         codeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f);
